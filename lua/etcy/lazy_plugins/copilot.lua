@@ -74,6 +74,10 @@ return {
         workspace_folders = {},
         copilot_model = '',
       }
+
+      vim.keymap.set('n', '<leader>tc', function()
+        require('copilot.suggestion').toggle_auto_trigger()
+      end, { desc = 'Toggle Copilot' })
     end,
   },
 }

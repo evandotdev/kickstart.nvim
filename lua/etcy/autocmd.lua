@@ -84,7 +84,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
     -- WARN: This is not Goto Definition, this is Goto Declaration.
     --  For example, in C this would take you to the header.
     vim.keymap.set('n', '<leader>gd', vim.lsp.buf.declaration, { desc = 'Goto Declaration' })
-    -- vim.keymap.set('n', '<leader>fs', require('fzf-lua').lsp_document_symbols, 'Search Document Symbols')
+    -- vim.keymap.set('n', '<leader>fS', require('fzf-lua').lsp_document_symbols, 'Search Document Symbols')
     vim.keymap.set('n', '<leader>fs', require('fzf-lua').lsp_live_workspace_symbols, { desc = 'find Symbols' })
 
     -- vim.keymap.set('n', 'gs', vim.lsp.buf.signature_help, '[G]oto [S]ignature')
