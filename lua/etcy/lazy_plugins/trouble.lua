@@ -32,7 +32,7 @@ return {
               -- NOTE: remove buffer limitation once more stable
               -- buf = 0, -- current buffer
               {
-                severity = { vim.diagnostic.severity.ERROR, vim.diagnostic.severity.WARN },
+                severity = { vim.diagnostic.severity.ERROR, vim.diagnostic.severity.WARN, vim.diagnostic.severity.INFO, vim.diagnostic.severity.HINT },
                 -- NOTE: limit to files in the current project
                 function(item)
                   return item.filename:find((vim.loop or vim.uv).cwd(), 1, true)
