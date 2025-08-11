@@ -24,6 +24,10 @@ local linters_formatters = {
   'ruff',
   -- 'mypy',
 
+  -- TYPESCRIPT/JAVASCRIPT TOOLS
+  'prettierd',
+  'eslint-lsp',
+
   -- BASH TOOLS
   'shfmt',
   'shellcheck',
@@ -37,6 +41,7 @@ local lsp_servers = {
   -- 'sourcery',
   'ts_ls',
   'bashls',
+  'prismals',
 }
 
 local function none_ls_setup()
@@ -53,21 +58,29 @@ local function none_ls_setup()
   -- use none-ls for linter & diagnostics
   null_ls.setup {
     sources = {
-      null_ls.builtins.formatting.stylua,
+      null_ls.builtins.formatting.prisma_format,
       null_ls.builtins.completion.spell,
-      -- none_ls.builtins.diagnostics.mypy,
+
+      -- CICD
+      null_ls.builtins.diagnostics.actionlint,
+
+      -- BASH
       null_ls.builtins.formatting.shfmt,
+      -- LUA
+      null_ls.builtins.formatting.stylua,
+      -- PYTHON
+      -- null_ls.builtins.diagnostics.mypy,
       -- GOLANG
       null_ls.builtins.formatting.gofumpt,
       null_ls.builtins.formatting.goimports,
       null_ls.builtins.formatting.golines,
       null_ls.builtins.diagnostics.golangci_lint,
-
       null_ls.builtins.code_actions.impl,
       null_ls.builtins.code_actions.refactoring,
       null_ls.builtins.code_actions.gomodifytags,
 
-      -- require("none-ls.diagnostics.eslint"), -- requires none-ls-extras.nvim
+      -- TYPESCRIPT/JAVASCRIPT
+      null_ls.builtins.formatting.prettierd,
     },
   }
 end
@@ -135,8 +148,12 @@ return {
           lua = { 'stylua' },
           -- Conform will run multiple formatters sequentially
           python = { 'ruff_fix', 'ruff_format' },
-          prisma = { 'prismals' },
+          prisma = { 'prisma_format' },
           javascript = { 'prettierd', 'prettier', stop_after_first = true },
+          typescript = { 'prettierd', 'prettier', stop_after_first = true },
+          javascriptreact = { 'prettierd', 'prettier', stop_after_first = true },
+          typescriptreact = { 'prettierd', 'prettier', stop_after_first = true },
+          json = { 'prettierd', 'prettier', stop_after_first = true },
           zsh = { 'shfmt' },
           bash = { 'shfmt' },
           sh = { 'shfmt' },
@@ -283,6 +300,43 @@ return {
             lspconfig.bashls.setup {}
           end,
 
+          ['ts_ls'] = function()
+            lspconfig.ts_ls.setup {
+              capabilities = require('blink.cmp').get_lsp_capabilities(),
+              settings = {
+                typescript = {
+                  inlayHints = {
+                    includeInlayParameterNameHints = 'all',
+                    includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+                    includeInlayFunctionParameterTypeHints = true,
+                    includeInlayVariableTypeHints = true,
+                    includeInlayVariableTypeHintsWhenTypeMatchesName = false,
+                    includeInlayPropertyDeclarationTypeHints = true,
+                    includeInlayFunctionLikeReturnTypeHints = true,
+                    includeInlayEnumMemberValueHints = true,
+                  },
+                },
+                javascript = {
+                  inlayHints = {
+                    includeInlayParameterNameHints = 'all',
+                    includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+                    includeInlayFunctionParameterTypeHints = true,
+                    includeInlayVariableTypeHints = true,
+                    includeInlayVariableTypeHintsWhenTypeMatchesName = false,
+                    includeInlayPropertyDeclarationTypeHints = true,
+                    includeInlayFunctionLikeReturnTypeHints = true,
+                    includeInlayEnumMemberValueHints = true,
+                  },
+                },
+              },
+              on_attach = function(client, bufnr)
+                if client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint.is_enabled { bufnr = bufnr } then
+                  vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+                end
+              end,
+            }
+          end,
+
           -- ['pylsp'] = function()
           --   lspconfig.pylsp.setup {
           --     capabilities = false,
@@ -328,6 +382,21 @@ return {
                   },
                 },
               },
+            }
+          end,
+
+          ['prismals'] = function()
+            local util = require 'lspconfig.util'
+            lspconfig.prismals.setup {
+              capabilities = require('blink.cmp').get_lsp_capabilities(),
+              cmd = { 'prisma-language-server', '--stdio' },
+              filetypes = { 'prisma' },
+              settings = {
+                prisma = {
+                  prismaFmtBinPath = '',
+                },
+              },
+              root_dir = util.root_pattern('.git', 'package.json'),
             }
           end,
         },
