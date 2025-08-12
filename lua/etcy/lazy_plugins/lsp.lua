@@ -26,7 +26,6 @@ local linters_formatters = {
 
   -- TYPESCRIPT/JAVASCRIPT TOOLS
   'prettierd',
-  'eslint-lsp',
 
   -- BASH TOOLS
   'shfmt',
@@ -214,7 +213,7 @@ return {
             require('lspconfig')[server_name].setup {
               capabilities = require('blink.cmp').get_lsp_capabilities(),
               on_attach = function(client, bufnr)
-                if client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint.is_enabled { bufnr = bufnr } then
+                if client.server_capabilities.inlayHintProvider then
                   vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
                 end
               end,
@@ -328,9 +327,15 @@ return {
                     includeInlayEnumMemberValueHints = true,
                   },
                 },
+                diagnostics = {
+                  ignoredCodes = {
+                    -- Example: Ignore specific diagnostic codes
+                    -- 2304, -- Cannot find name 'XYZ'
+                  },
+                },
               },
               on_attach = function(client, bufnr)
-                if client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint.is_enabled { bufnr = bufnr } then
+                if client.server_capabilities.inlayHintProvider then
                   vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
                 end
               end,
