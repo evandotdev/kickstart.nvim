@@ -9,8 +9,23 @@ vim.keymap.set('n', 'k', 'gk')
 vim.keymap.set('n', 'j', 'gj')
 -- allow single line travel when lines visually wrap
 if vim.g.vscode then
+  -- Search
+  vim.opt.hlsearch = false
+  -- Text objects
+  vim.opt.iskeyword = vim.opt.iskeyword + '-' -- Treat dash separated words as a word text object
+  vim.opt.wrap = false
+
+  -- Sync clipboard between OS and Neovim.
+  --  Schedule the setting after `UiEnter` because it can increase startup-time.
+  --  Remove this option if you want your OS clipboard to remain independent.
+  --  See `:help 'clipboard'`
+  vim.schedule(function()
+    vim.opt.clipboard = 'unnamedplus'
+  end)
+
   -- set scroll=10 <- being overridden by something so set 10 manually here
   -- FIXME doesn't work atm
+  local opts = { noremap = true }
   vim.keymap.set('n', '<C-d>', '10<C-d>zz')
   vim.keymap.set('n', '<C-u>', '10<C-u>zz')
   vim.keymap.set('n', 'n', 'nzzzv', opts)
